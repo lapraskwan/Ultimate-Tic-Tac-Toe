@@ -8,12 +8,13 @@ class SubBoard:
         self.board_size = board_size
         # None: not yet ended, 0: tie, 1: player 1 is the winner, 2: player 2 is the winner
         self.winner = None
-
         self.cells = [[None for column in range(self.board_size)] for row in range(self.board_size)]
-        # self.cells = [[1,2,3],[4,5,6],[7,8,9]]
     
     def make_move(self, player, coor):
         """ If a move is made successfully, return True, else return False """
+        if self.winner is not None:
+            print("Invalid Board")
+            return False
         if any(x not in range(self.board_size) for x in coor):
             print("Move out of boundary")
             return False
@@ -23,6 +24,7 @@ class SubBoard:
         if self.cells[coor[0]][coor[1]] is not None:
             print("Cell occupied")
             return False
+
         self.cells[coor[0]][coor[1]] = player
         winner = self.get_winner()
         if winner is not None:
@@ -30,6 +32,7 @@ class SubBoard:
         return True
     
     def get_all_empty_cells(self):
+        """ Return a list of empty cells, e.g. [(0,0), (1,2)] """
         empty_cells = []
         for i in range(self.board_size):
             for j in range(self.board_size):

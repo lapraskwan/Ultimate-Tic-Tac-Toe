@@ -1,6 +1,5 @@
 from sub_board import SubBoard
 
-
 class MainBoard:
     """
     A Class representing the main board
@@ -17,19 +16,16 @@ class MainBoard:
         self.current_move = 0
         self.current_player = 1
 
-    def make_move(self, player, main_board_coor, sub_board_coor):
+    def make_move(self, main_board_coor, sub_board_coor):
         """ If a move is made successfully, return True, else return False """
         if any(x not in range(self.board_size) for x in main_board_coor) or any(x not in range(self.board_size) for x in sub_board_coor):
             print("Move out of boundary")
-            return False
-        if player != 1 and player != 2:
-            print("Invalid Player ID")
             return False
         if main_board_coor not in self.allowed_sub_boards:
             print("Invalid Sub-board")
             return False
         target_sub_board = self.sub_boards[main_board_coor[0]][main_board_coor[1]]
-        result = target_sub_board.make_move(player, sub_board_coor)
+        result = target_sub_board.make_move(self.current_player, sub_board_coor)
         if not result:
             return result
         # A successful move is made
@@ -37,13 +33,14 @@ class MainBoard:
         self.update_allowed_sub_boards(sub_board_coor)
         self.current_move += 1
         # If player is 1, then 2/1 is 2; If player is 2, then 2/2 is 1
-        self.current_player = int(2 / player)
+        self.current_player = int(2 / self.current_player)
         winner = self.get_winner()
         if winner is not None:
             self.winner = winner
         return True
 
     def update_allowed_sub_boards(self, sub_board_coor):
+        """ Updates the allowed_sub_boards for next move """
         if self.sub_board_values[sub_board_coor[0]][sub_board_coor[1]] is None:
             self.allowed_sub_boards = [sub_board_coor]
         else:
@@ -87,6 +84,7 @@ class MainBoard:
         return 0
 
     def get_legal_moves(self):
+        """ Return all legal moves """
         if self.winner is not None:
             return []
         possible_moves = []
@@ -96,13 +94,14 @@ class MainBoard:
         return possible_moves
 
     def print_board(self):
-        print('***********************')
+        """ Print out the game state """
+        print(('******' + '**' * (self.board_size - 2)) * self.board_size)
         if self.current_move == 0:
             print("      Game Starts!")
         else:
             print('  Move ' + str(self.current_move) + " by Player " + str(int(2 / self.current_player)))
-        print('***********************')
-        print('-----------------------')
+        print(('******' + '**' * (self.board_size - 2)) * self.board_size)
+        print(('------' + '--' * (self.board_size - 2)) * self.board_size)
         for y_main in range(self.board_size):
             for y_sub in range(self.board_size):
                 for x_main in range(self.board_size):
@@ -111,7 +110,7 @@ class MainBoard:
                         print(value if value is not None else '_', end = '')
                         if x_main == self.board_size - 1 and x_sub == self.board_size - 1 and y_sub == self.board_size - 1:
                             print()
-                            print('-----------------------')
+                            print(('------' + '--' * (self.board_size - 2)) * self.board_size)
                         elif x_main == self.board_size - 1 and x_sub == self.board_size - 1:
                             print()
                         elif x_sub == self.board_size - 1:
