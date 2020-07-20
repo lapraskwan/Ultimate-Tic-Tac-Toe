@@ -1,5 +1,5 @@
 # Ultimate-Tic-Tac-Toe
-An ultimate tic tac toe game. You can play with a random agent, AI agent (implemented with Monte Carlo Tree Search), or let them playing with each other.
+An ultimate tic tac toe game. You can play with a random agent, AI agent (implemented with Monte Carlo Tree Search), or let them play with each other.
 
 ## To run the program
 
