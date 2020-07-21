@@ -96,7 +96,7 @@ class MCTSPlayer(Player):
                 break
         
         # Run simulations
-        for _ in range(1000):
+        for _ in range(100):
             self.tree.simulation()
 
         self.best_node = self.tree.get_best_node()

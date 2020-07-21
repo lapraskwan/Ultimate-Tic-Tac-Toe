@@ -25,9 +25,10 @@ python game.py human MCTS
 ```
 
 ## AI Performance
-I implemented the AI using Monte Carlo Tree Search.
-Currently, without any improvements on the algorithm, when tested with 1000 games, it achieved a win rate of 95% against a random player,
-with 2.1% draw and 2.9% loss.
+I implemented the AI using Monte Carlo Tree Search. 
+Using 100 iterations per move, the AI wins 99 games out of 100, with 1 draw, against a random agent.  
+Using 1000 iterations per move, the AI wins all 100 games against a random agent.  
+Using 10000 iterations per move, the AI can beat me sometimes.  
 
 ## Sample Game Board and Result
 ```
@@ -56,5 +57,7 @@ Loss:  1
 ```
 
 ## TO DO
-1. Speed up the simulation using threads
-2. Try out pygame to create a GUI
+1. Give heuristics to avoid instant loss
+2. Keep simulating when opponent is making move
+3. Try to make it run faster
+4. Try out pygame to create a GUI
