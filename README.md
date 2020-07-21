@@ -1,28 +1,21 @@
 # Ultimate-Tic-Tac-Toe
-An ultimate tic tac toe game. You can play with a random agent, AI agent (implemented with Monte Carlo Tree Search), or let them playing with each other.
+An ultimate tic tac toe game. You can play with a random agent, AI agent (implemented with Monte Carlo Tree Search), or let them play with each other.
+This program also supports board sizes other than 3, you can set the board size when you run the program.
 
 ## To run the program
 
-Use the following command to run the program
+Use the following command to run the program:
 ```
 python game.py [-h] [-m] [-n NUMBER_OF_GAMES] [-s BOARD_SIZE] player_1 player_2
 ```
-positional arguments:  
-  player_1              Agent of player 1. (random, human or MCTS)  
-  player_2              Agent of player 2. (random, human or MCTS)  
+player_1 and player_2 are one of the followings: random, human and MCTS.
 
-optional arguments:  
-  -h, --help            show this help message and exit  
-  -m, --mute            Do not print board  
-  -n NUMBER_OF_GAMES, --number_of_games NUMBER_OF_GAMES  
-                        Number of games to play. Default 1.  
-  -s BOARD_SIZE, --board_size BOARD_SIZE  
-                        Board Size. Default 3.  
-
-For example if you want to be player 1 and play against a MCTS agent
+For example if you want to be player 1 and play against a MCTS agent,
 ```
 python game.py human MCTS
 ```
+
+If you want to change the number of simulations per step for the MCTS agent, please change it in player.py.
 
 ## AI Performance
 I implemented the AI using Monte Carlo Tree Search. 
