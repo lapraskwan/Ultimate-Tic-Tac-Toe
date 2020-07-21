@@ -40,6 +40,7 @@ class MCTS:
         best_node = None
         max_reward = None
         for node in self.root_node.child_nodes:
+            # print(node.move, node.total_reward / node.visited_times)
             if node.visited_times != 0:
                 if best_node == None and max_reward == None:
                     best_node = node
@@ -47,7 +48,7 @@ class MCTS:
                 else:
                     reward = node.total_reward / node.visited_times
                     if reward > max_reward:
-                        max_UCB1 = reward
+                        max_reward = reward
                         best_node = node
         return best_node
     
