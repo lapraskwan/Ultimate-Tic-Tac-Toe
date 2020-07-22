@@ -3,15 +3,15 @@ from monte_carlo_tree_search import MCTS
 import sys
 import random
 import re
+from copy import deepcopy
+import time
 
 class Player:
     """
     Represents a player who make moves to play the game
     """
-    def __init__(self, main_board, player_id):
+    def __init__(self, main_board):
         self.main_board = main_board
-        # Only used in MCTSPlayer to check whether it has won in a simulation
-        self.player_id = player_id
 
     def make_move(self, main_board_coor, sub_board_coor):
         """ If a move is made successfully, return True, else return False """
@@ -70,37 +70,44 @@ class MCTSPlayer(Player):
     """
     A player that uses the Monte Carlo Tree Search to choose a move that is more likely to win
     """
-    def __init__(self, main_board, player_id):
-        super().__init__(main_board, player_id)
-        self.tree = MCTS(self.main_board, 2, self.player_id)
-        self.best_node = None
+    def __init__(self, main_board, player_id, num_of_simulation = 100, time_limit = None):
+        super().__init__(main_board)
+        # To check whether this player has won in a simulation
+        self.player_id = player_id
+        self.num_of_simulation = num_of_simulation
+        self.time_limit = time_limit
+        self.tree = MCTS(deepcopy(self.main_board), 2, self.player_id)
+        self.best_node = self.tree.root_node
     
     def get_opponent_move(self):
-        if self.best_node is None:
-            return None
         for x_main in range(self.main_board.board_size):
             for y_main in range(self.main_board.board_size):
                 for x_sub in range(self.main_board.board_size):
                     for y_sub in range(self.main_board.board_size):
                         if self.best_node.game_state.sub_boards[y_main][x_main].cells[y_sub][x_sub] != self.main_board.sub_boards[y_main][x_main].cells[y_sub][x_sub]:
                             return ((y_main, x_main), (y_sub, x_sub))
+        return None
 
     def get_move(self):
+        start_time = time.time()
         # Update root node to the node after opponent moved
         if not self.tree.root_node.child_nodes:
             self.tree.root_node.expand()
         for node in self.tree.root_node.child_nodes:
             if node.move == self.get_opponent_move():
                 self.tree.root_node = node
-                node.parent_node = None
+                self.tree.root_node.parent_node = None
                 break
-        
         # Run simulations
-        for _ in range(100):
+        for _ in range(self.num_of_simulation):
+            if self.time_limit is not None and time.time() - start_time >= self.time_limit:
+                break
             self.tree.simulation()
 
         self.best_node = self.tree.get_best_node()
         best_move = self.best_node.move
+        # end_time = time.time()
+        # print(end_time - start_time)
         return best_move
     
     def make_move(self, main_board_coor, sub_board_coor):
@@ -108,6 +115,7 @@ class MCTSPlayer(Player):
         result = self.main_board.make_move(main_board_coor, sub_board_coor)
         if result:
             # Update self.tree, so that the root node is the chosen child node of the original root node
+            # At this moment, opponent is the current_player
             self.tree.root_node = self.best_node
             self.tree.root_node.parent_node = None
         return result
