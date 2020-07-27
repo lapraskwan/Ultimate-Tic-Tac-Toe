@@ -23,15 +23,15 @@ class MCTS:
         while node.child_nodes:
             best_node = None
             max_UCB1 = None
-            for node in node.child_nodes:
+            for child_node in node.child_nodes:
                 if best_node == None and max_UCB1 == None:
-                    best_node = node
-                    max_UCB1 = node.compute_UCB1()
+                    best_node = child_node
+                    max_UCB1 = child_node.compute_UCB1()
                 else:
-                    ucb1 = node.compute_UCB1()
+                    ucb1 = child_node.compute_UCB1()
                     if ucb1 > max_UCB1:
                         max_UCB1 = ucb1
-                        best_node = node
+                        best_node = child_node
             node = best_node
         return node
     
@@ -50,6 +50,8 @@ class MCTS:
                     if reward > max_reward:
                         max_reward = reward
                         best_node = node
+        if best_node is None:
+            return self.root_node.child_nodes[0]
         return best_node
     
     def simulation(self):

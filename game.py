@@ -2,7 +2,7 @@ import sys
 import argparse
 
 from main_board import MainBoard
-from player import RandomPlayer, HumanPlayer, MCTSPlayer
+from player import RandomPlayer, HumanPlayer, MCTSPlayer, MCRAVEPlayer
 
 def get_parser():
     # Parse Arguments
@@ -24,6 +24,8 @@ def get_player(main_board, player_type, player_id, number_of_simulations = 100, 
         return HumanPlayer(main_board)
     if player_type == 'MCTS':
         return MCTSPlayer(main_board, player_id, number_of_simulations, time_limit)
+    if player_type == 'MCRAVE':
+        return MCRAVEPlayer(main_board, player_id, number_of_simulations, time_limit)
 
 def start_game(player_type_1 = 'random', player_type_2 = 'random', is_print_board = True, board_size = 3, number_of_simulations = 100, time_limit = None):
     if is_print_board:
@@ -46,11 +48,11 @@ def start_game(player_type_1 = 'random', player_type_2 = 'random', is_print_boar
             main_board.print_board()
 
     if main_board.winner == 0:
-        if is_print_board:
+        if is_print_board or True:
             print("The result of this game is ...... a draw!!!")
         return 0
     else:
-        if is_print_board:
+        if is_print_board or True:
             print("The winner is ...... Player " + str(int(2 / main_board.current_player)) + "!!!")
         return int(2 / main_board.current_player)
 
@@ -63,7 +65,7 @@ if __name__ == "__main__":
     is_print_board = False if args.mute else True
     number_of_games = args.number_of_games if args.number_of_games else 1
     board_size = args.board_size if args.board_size else 3
-    number_of_simulations = args.number_of_simulations if args.number_of_simulations else 100
+    number_of_simulations = args.number_of_simulations if args.number_of_simulations == 0 or args.number_of_simulations else 100
     time_limit = args.time_limit if args.time_limit else None
 
     win = 0
@@ -80,6 +82,10 @@ if __name__ == "__main__":
             loss += 1
 
     print("Result of " + str(number_of_games) + " game(s) " + player_1 + " vs " + player_2 + "")
+    if number_of_simulations:
+        print("Number of simulations per move: ", number_of_simulations)
+    if time_limit:
+        print("Time limit per move: ", time_limit)
     print("Win (Player 1): ", win)
     print("Draw: ", draw)
     print("Loss: ", loss)

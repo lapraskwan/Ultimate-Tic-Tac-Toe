@@ -1,5 +1,6 @@
 from main_board import MainBoard
 from monte_carlo_tree_search import MCTS
+from mc_rave import MCRAVE
 import sys
 import random
 import re
@@ -38,6 +39,8 @@ class RandomPlayer(Player):
 class HumanPlayer(Player):
     """
     Let the user chooses the moves by typing into the command line.
+
+    User should input two strings with a format of [0-2],[0,2], e.g. 1,2, representing the main board coor and the sub board coor
     """
     def get_move(self):
         coor_format = re.compile('\d,\d')
@@ -99,23 +102,52 @@ class MCTSPlayer(Player):
                 self.tree.root_node.parent_node = None
                 break
         # Run simulations
-        for _ in range(self.num_of_simulation):
-            if self.time_limit is not None and time.time() - start_time >= self.time_limit:
-                break
-            self.tree.simulation()
+        if self.num_of_simulation != 0:
+            for _ in range(self.num_of_simulation):
+                if self.time_limit is not None and time.time() - start_time >= self.time_limit:
+                    break
+                self.tree.simulation()
 
         self.best_node = self.tree.get_best_node()
         best_move = self.best_node.move
-        # end_time = time.time()
-        # print(end_time - start_time)
+        end_time = time.time()
+        # print(self.player_id, end_time - start_time)
         return best_move
     
     def make_move(self, main_board_coor, sub_board_coor):
         """ If a move is made successfully, return True, else return False """
+        # print("Before make move: ", self.tree.root_node.move)
         result = self.main_board.make_move(main_board_coor, sub_board_coor)
         if result:
             # Update self.tree, so that the root node is the chosen child node of the original root node
             # At this moment, opponent is the current_player
             self.tree.root_node = self.best_node
             self.tree.root_node.parent_node = None
+        # print("After make move: ", self.tree.root_node.move)
+        return result
+
+class MCRAVEPlayer(MCTSPlayer):
+    def __init__(self, main_board, player_id, num_of_simulation=100, time_limit=None):
+        super().__init__(main_board, player_id, num_of_simulation=num_of_simulation, time_limit=time_limit)
+        self.tree = MCRAVE(deepcopy(self.main_board), 2, self.player_id)
+
+    def get_move(self):
+        start_time = time.time()
+        tree = MCRAVE(deepcopy(self.main_board), 2, self.player_id)
+        # Run simulations
+        if self.num_of_simulation != 0:
+            for _ in range(self.num_of_simulation):
+                if self.time_limit is not None and time.time() - start_time >= self.time_limit:
+                    break
+                tree.simulation()
+
+        best_node = tree.get_best_node()
+        best_move = best_node.move
+        end_time = time.time()
+        # print(self.player_id, end_time - start_time)
+        return best_move
+
+    def make_move(self, main_board_coor, sub_board_coor):
+        """ If a move is made successfully, return True, else return False """
+        result = self.main_board.make_move(main_board_coor, sub_board_coor)
         return result
