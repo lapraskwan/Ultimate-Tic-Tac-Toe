@@ -8,11 +8,11 @@ Use the following command to run the program:
 ```
 python game.py [-h] [-m] [-n NUMBER_OF_GAMES] [-b BOARD_SIZE] [-s NUMBER_OF_SIMULATIONS] [-t TIME_LIMIT] player_1 player_2
 ```
-player_1 and player_2 are one of the followings: random, human and MCTS.
+player_1 and player_2 are one of the followings: random, human and mcts, mcrave, hmcrave (super slow).
 
 For example if you want to be player 1 and play against a MCTS agent,
 ```
-python game.py human MCTS
+python game.py human mcts
 ```
 
 For the MCTS player, you can set the number of simulations per move, and time limit per move.
@@ -20,10 +20,19 @@ It will run the given number of simulations per move unless the time limit is re
 The default number of simulations per move is 100, and the default time limit is None.
 
 ## AI Performance
-I implemented the AI using Monte Carlo Tree Search.  
+I implemented the AI using Monte Carlo Tree Search.   
+MCTS Player:  
 Using 100 iterations per move, the AI wins 99 games out of 100, with 1 draw, against a random agent.  
 Using 1000 iterations per move, the AI wins all 100 games against a random agent.  
 Using 10000 iterations per move, the AI can beat me sometimes.  
+  
+Trying to improve the AI, I implemented a UCT MC-RAVE player.
+It's performance is similar to pure MCTS, maybe even a bit worse than pure MCTS. One possible reason could be the small relation between moves encoutered in rollout, and the same move as a sibling. This is due to the nature of the game, where legal moves jump from sub-boards to sub-boards. 
+Another possible reason is the exploration weight in UCB1 and the arbitrary constant in Beta are not perfectly fine tuned.  
+
+I also implemented a heuristic version of UCT MC-RAVE. The win rate against pure MCTS does improve, but the agent becomes too slow.
+
+In the next stage, I am going to try out MCTS solver, and then use neural networks to further improve the AI.
 
 ## Sample Game Board and Result
 ```
@@ -52,7 +61,7 @@ Loss:  1
 ```
 
 ## TO DO
-1. Give heuristics to avoid instant loss
+1. MCTS Solver
 2. Keep simulating when opponent is making move(?)
 3. Try to make it run faster
 4. Try out pygame to create a GUI
