@@ -24,7 +24,7 @@ class MCTS:
             best_node = None
             max_UCB1 = None
             for child_node in node.child_nodes:
-                if best_node == None and max_UCB1 == None:
+                if best_node is None and max_UCB1 is None:
                     best_node = child_node
                     max_UCB1 = child_node.compute_UCB1()
                 else:
@@ -42,7 +42,7 @@ class MCTS:
         for node in self.root_node.child_nodes:
             # print(node.move, node.total_reward / node.visited_times)
             if node.visited_times != 0:
-                if best_node == None and max_reward == None:
+                if best_node is None and max_reward is None:
                     best_node = node
                     max_reward = node.total_reward / node.visited_times
                 else:
