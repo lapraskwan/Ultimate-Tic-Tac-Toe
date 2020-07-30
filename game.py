@@ -2,7 +2,7 @@ import sys
 import argparse
 
 from main_board import MainBoard
-from player import RandomPlayer, HumanPlayer, MCTSPlayer, MCRAVEPlayer, HMCRAVEPlayer
+from player import RandomPlayer, HumanPlayer, MCTSPlayer, MCRAVEPlayer, HMCRAVEPlayer, MCTSSolverPlayer
 
 def get_parser():
     # Parse Arguments
@@ -28,6 +28,8 @@ def get_player(main_board, player_type, player_id, number_of_simulations = 100, 
         return MCRAVEPlayer(main_board, player_id, number_of_simulations, time_limit)
     if player_type == 'hmcrave':
         return HMCRAVEPlayer(main_board, player_id, number_of_simulations, time_limit)
+    if player_type == 'mctss':
+        return MCTSSolverPlayer(main_board, player_id, number_of_simulations, time_limit)
 
 def start_game(player_type_1 = 'random', player_type_2 = 'random', is_print_board = True, board_size = 3, number_of_simulations = 100, time_limit = None):
     if is_print_board:

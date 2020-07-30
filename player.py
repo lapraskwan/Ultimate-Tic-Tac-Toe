@@ -2,6 +2,7 @@ from main_board import MainBoard
 from monte_carlo_tree_search import MCTS
 from mc_rave import MCRAVE
 from heuristic_mc_rave import HMCRAVE
+from mcts_solver import MCTSSolver
 import sys
 import random
 import re
@@ -134,3 +135,8 @@ class HMCRAVEPlayer(MCTSPlayer):
     def __init__(self, main_board, player_id, num_of_simulation=100, time_limit=None):
         super().__init__(main_board, player_id, num_of_simulation=num_of_simulation, time_limit=time_limit)
         self.tree = HMCRAVE(deepcopy(self.main_board), 2, self.player_id)
+
+class MCTSSolverPlayer(MCTSPlayer):
+    def __init__(self, main_board, player_id, num_of_simulation=100, time_limit=None):
+        super().__init__(main_board, player_id, num_of_simulation=num_of_simulation, time_limit=time_limit)
+        self.tree = MCTSSolver(deepcopy(self.main_board), 2, self.player_id)
