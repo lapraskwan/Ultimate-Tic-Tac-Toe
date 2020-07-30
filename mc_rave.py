@@ -39,7 +39,10 @@ class MCRAVE(MCTS):
             target_node.expand()
             target_node = target_node.child_nodes[0]
         reward, action_sequence = target_node.rollout()
-        target_node.back_propagation(reward, action_sequence)
+        if target_node.game_state.current_player == self.player_id:
+            target_node.back_propagation(-reward, action_sequence)
+        else:
+            target_node.back_propagation(reward, action_sequence)
 
 
 class MCRAVENode(Node):
@@ -108,7 +111,7 @@ class MCRAVENode(Node):
             # else:
             #     self.action_amaf_count_value_map[action] = (1, reward)
         if self.parent_node is not None:
-            self.parent_node.back_propagation(reward, action_sequence)
+            self.parent_node.back_propagation(-reward, action_sequence)
 
     def expand(self):
         """ Create child nodes """

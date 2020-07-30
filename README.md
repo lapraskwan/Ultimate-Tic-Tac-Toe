@@ -33,6 +33,12 @@ Another possible reason is the exploration weight in UCB1 and the arbitrary cons
 I also implemented a heuristic version of UCT MC-RAVE. The win rate against pure MCTS does improve, but the agent becomes too slow.
 
 In the next stage, I am going to try out MCTS solver, and then use neural networks to further improve the AI.
+Result of 100 game(s) hmcrave vs mcts  
+Played as both players for 50 times each
+Number of simulations per move:  1000
+Win (Player 1):  57
+Draw:  11
+Loss:  32
 
 ## Sample Game Board and Result
 ```

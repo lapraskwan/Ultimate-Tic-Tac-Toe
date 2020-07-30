@@ -14,7 +14,7 @@ class MCTS:
         self.exploration_weight = exploration_weight
         # Player id of the agent, not the current player of each node
         self.player_id = player_id
-    
+
     def selection(self):
         """
         Return the leave node with the best UCB1 along the path
@@ -24,17 +24,17 @@ class MCTS:
             best_node = None
             max_UCB1 = None
             for child_node in node.child_nodes:
+                ucb1 = child_node.compute_UCB1()
                 if best_node is None and max_UCB1 is None:
                     best_node = child_node
-                    max_UCB1 = child_node.compute_UCB1()
+                    max_UCB1 = ucb1
                 else:
-                    ucb1 = child_node.compute_UCB1()
                     if ucb1 > max_UCB1:
                         max_UCB1 = ucb1
                         best_node = child_node
             node = best_node
         return node
-    
+
     def get_best_node(self):
         """ Get the best child node """
         best_node = None
@@ -53,7 +53,7 @@ class MCTS:
         if best_node is None:
             return self.root_node.child_nodes[0]
         return best_node
-    
+
     def simulation(self):
         """ Execute one iteration of simulation (selection + expansion + rollout + backpropagation) """
         target_node = self.selection()
@@ -61,7 +61,10 @@ class MCTS:
             target_node.expand()
             target_node = target_node.child_nodes[0]
         reward = target_node.rollout()
-        target_node.back_propagation(reward)
+        if target_node.game_state.current_player == self.player_id:
+            target_node.back_propagation(-reward)
+        else:
+            target_node.back_propagation(reward)
 
 class Node:
     """
@@ -117,4 +120,4 @@ class Node:
         self.visited_times += 1
         self.total_reward += reward
         if self.parent_node is not None:
-            self.parent_node.back_propagation(reward)
+            self.parent_node.back_propagation(-reward)
