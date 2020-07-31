@@ -8,8 +8,8 @@ def get_parser():
     # Parse Arguments
     parser = argparse.ArgumentParser(
         description="An Untimate Tic Tac Toe Game")
-    parser.add_argument('player_1', help="Agent of player 1. (random, human or MCTS)")
-    parser.add_argument('player_2', help="Agent of player 2. (random, human or MCTS)")
+    parser.add_argument('player_1', help="Agent of player 1. (random, human, mcts, mctss, mcrave or hmcrave)")
+    parser.add_argument('player_2', help="Agent of player 2. (random, human, mcts, mctss, mcrave or hmcrave)")
     parser.add_argument('-m', '--mute', action="store_true", help="Do not print board")
     parser.add_argument('-n', '--number_of_games', type=int, help="Number of games to play. Default 1")
     parser.add_argument('-b', '--board_size', type=int, help="Board Size. Default 3.")

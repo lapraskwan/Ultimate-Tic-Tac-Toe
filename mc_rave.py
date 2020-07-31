@@ -6,11 +6,8 @@ import random
 
 class MCRAVE(MCTS):
     def __init__(self, root_game_state, exploration_weight, player_id):
+        super().__init__(root_game_state, exploration_weight, player_id)
         self.root_node = MCRAVENode(root_game_state, None, None, exploration_weight, player_id)
-        self.root_node.expand()
-        self.exploration_weight = exploration_weight
-        # Player id of the agent, not the current player of each node
-        self.player_id = player_id
 
     def get_best_node(self):
         """ Get the best child node """
@@ -120,6 +117,9 @@ class MCRAVENode(Node):
             for move in legal_moves:
                 child_game_state = deepcopy(self.game_state)
                 child_game_state.make_move(move[0], move[1])
-                self.child_nodes.append(MCRAVENode(child_game_state, move, self, self.exploration_weight, self.player_id))
+                self.child_nodes.append(self.get_new_node(child_game_state, move, self, self.exploration_weight, self.player_id))
                 # To make sure move is in action_amaf_count_value_map
                 self.action_amaf_count_value_map[move] = (0, 0)
+
+    def get_new_node(self, game_state, move, parent_node, exploration_weight, player_id):
+        return MCRAVENode(game_state, move, parent_node, exploration_weight, player_id)

@@ -8,6 +8,7 @@ import random
 import re
 from copy import deepcopy
 import time
+import math
 
 class Player:
     """
@@ -140,3 +141,30 @@ class MCTSSolverPlayer(MCTSPlayer):
     def __init__(self, main_board, player_id, num_of_simulation=100, time_limit=None):
         super().__init__(main_board, player_id, num_of_simulation=num_of_simulation, time_limit=time_limit)
         self.tree = MCTSSolver(deepcopy(self.main_board), 2, self.player_id)
+
+    def get_move(self):
+        start_time = time.time()
+        # Update root node to the node after opponent moved
+        if not self.tree.root_node.child_nodes:
+            self.tree.root_node.expand()
+        for node in self.tree.root_node.child_nodes:
+            if node.move == self.get_opponent_move():
+                self.tree.root_node = node
+                self.tree.root_node.parent_node = None
+                break
+        # Run simulations
+        if self.num_of_simulation != 0:
+            for _ in range(self.num_of_simulation):
+                if self.time_limit is not None and time.time() - start_time >= self.time_limit:
+                    break
+                for child_node in self.tree.root_node.child_nodes:
+                    # Early stop
+                    if child_node.total_reward == math.inf:
+                        return child_node.move
+                self.tree.simulation()
+
+        self.best_node = self.tree.get_best_node()
+        best_move = self.best_node.move
+        end_time = time.time()
+        # print(self.player_id, end_time - start_time)
+        return best_move

@@ -6,11 +6,8 @@ import random
 
 class HMCRAVE(MCTS):
     def __init__(self, root_game_state, exploration_weight, player_id):
+        super().__init__(root_game_state, exploration_weight, player_id)
         self.root_node = HMCRAVENode(root_game_state, None, None, exploration_weight, player_id)
-        self.root_node.expand()
-        self.exploration_weight = exploration_weight
-        # Player id of the agent, not the current player of each node
-        self.player_id = player_id
 
     def get_best_node(self):
         """ Get the best child node """
@@ -126,7 +123,10 @@ class HMCRAVENode(Node):
                 self.action_amaf_count_value_map[move] = (amaf_count, amaf_value)
                 child_game_state = deepcopy(self.game_state)
                 child_game_state.make_move(move[0], move[1])
-                self.child_nodes.append(HMCRAVENode(child_game_state, move, self, self.exploration_weight, self.player_id, mc_value=mc_value, mc_count=mc_count))
+                self.child_nodes.append(self.get_new_node(child_game_state, move, self, self.exploration_weight, self.player_id, mc_value=mc_value, mc_count=mc_count))
+
+    def get_new_node(self, game_state, move, parent_node, exploration_weight, player_id, mc_value = 0, mc_count = 0):
+        return HMCRAVENode(game_state, move, parent_node, exploration_weight, player_id, mc_value=mc_value, mc_count=mc_count)
 
     def heuristic(self, move):
         """

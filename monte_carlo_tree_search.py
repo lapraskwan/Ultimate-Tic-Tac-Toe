@@ -106,8 +106,8 @@ class Node:
             for move in legal_moves:
                 child_game_state = deepcopy(self.game_state)
                 child_game_state.make_move(move[0], move[1])
-                self.child_nodes.append(Node(child_game_state, move, self, self.exploration_weight, self.player_id))
-
+                self.child_nodes.append(self.get_new_node(child_game_state, move, self, self.exploration_weight, self.player_id))
+    
     def compute_UCB1(self):
         """ Compute the UCB1 value """
         if self.visited_times == 0:
@@ -121,3 +121,6 @@ class Node:
         self.total_reward += reward
         if self.parent_node is not None:
             self.parent_node.back_propagation(-reward)
+    
+    def get_new_node(self, game_state, move, parent_node, exploration_weight, player_id):
+        return Node(game_state, move, parent_node, exploration_weight, player_id)
