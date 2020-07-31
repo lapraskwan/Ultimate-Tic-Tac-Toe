@@ -31,21 +31,24 @@ It's performance is similar to pure MCTS, maybe even a bit worse than pure MCTS.
 Another possible reason is the exploration weight in UCB1 and the arbitrary constant in Beta are not perfectly fine tuned.  
 
 I also implemented a heuristic version of UCT MC-RAVE. The win rate against pure MCTS does improve, but the agent becomes too slow.
-
+```
 Result of 100 game(s) hmcrave vs mcts  
 Played as both players for 50 times each
 Number of simulations per move:  1000  
 Win (Player 1):  57  
 Draw:  11  
 Loss:  32  
+```
 
-After that, I implemented the MCTS Solver described by M. H. M. Winands, Y. Bjo ̈rnsson, and J.-T. Saito in their paper “Monte-Carlo Tree Search Solver”. The result is promising:
+After that, I implemented the MCTS Solver described by M. H. M. Winands, Y. Bjo ̈rnsson, and J.-T. Saito in their paper “Monte-Carlo Tree Search Solver”. The result is promising:  
+```
 Result of 100 game(s) mctss vs mcts  
 Played as both player for 50 games  
 Number of simulations per move:  1000  
 Win (Player 1):  48  
 Draw:  25  
 Loss:  27  
+```
 
 In the next step, I am going to try out neural networks for futher improvements.
 
