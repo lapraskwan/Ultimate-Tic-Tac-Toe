@@ -1,4 +1,5 @@
 from sub_board import SubBoard
+import config
 
 class MainBoard:
     """
@@ -7,7 +8,7 @@ class MainBoard:
     UpperLeft sub-board is (0, 0), UpperRight sub-board is (0, 2)
     """
 
-    def __init__(self, board_size=3):
+    def __init__(self, board_size = config.board_size):
         self.board_size = board_size
         self.sub_board_values = [[None for column in range(self.board_size)] for row in range(self.board_size)]
         self.sub_boards = [[SubBoard(self.board_size) for column in range(self.board_size)] for row in range(self.board_size)]
@@ -117,3 +118,16 @@ class MainBoard:
                             print(' || ', end='')
                         else:
                             print('|', end='')
+
+    def to_array(self):
+        array = []
+        all_sub_boards = [(x, y) for x in range(self.board_size) for y in range(self.board_size)]
+        for subboard_idx in all_sub_boards:
+            for y in range(self.board_size):
+                for x in range(self.board_size):
+                    array.append(self.sub_boards[subboard_idx[0]][subboard_idx[1]].cells[y][x]
+                                 if self.sub_boards[subboard_idx[0]][subboard_idx[1]].cells[y][x] is not None else 0)
+
+        player1_array = [1 if x == 1 else 0 for x in array]
+        player2_array = [1 if x == 2 else 0 for x in array]
+        return player1_array, player2_array

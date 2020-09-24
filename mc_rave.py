@@ -2,12 +2,15 @@ from monte_carlo_tree_search import MCTS, Node
 import math
 from copy import deepcopy
 import random
+import config
 
 
 class MCRAVE(MCTS):
-    def __init__(self, root_game_state, exploration_weight, player_id):
-        super().__init__(root_game_state, exploration_weight, player_id)
-        self.root_node = MCRAVENode(root_game_state, None, None, exploration_weight, player_id)
+    def __init__(self, root_game_state, player_id):
+        self.root_node = MCRAVENode(root_game_state, None, None, player_id)
+        self.root_node.expand()
+        # Player id of the agent, not the current player of each node
+        self.player_id = player_id
 
     def get_best_node(self):
         """ Get the best child node """
@@ -43,8 +46,8 @@ class MCRAVE(MCTS):
 
 
 class MCRAVENode(Node):
-    def __init__(self, game_state, move, parent_node, exploration_weight, player_id):
-        super().__init__(game_state, move, parent_node, exploration_weight, player_id)
+    def __init__(self, game_state, move, parent_node, player_id):
+        super().__init__(game_state, move, parent_node, player_id)
         # Map of tuples: { action: (amaf_count, amaf_value) }
         self.action_amaf_count_value_map = {}
 
@@ -84,11 +87,11 @@ class MCRAVENode(Node):
             return math.inf
         beta = amaf_count / (self.visited_times + amaf_count + 4 * self.visited_times * amaf_count * 0.2)
         if amaf_count == 0:
-            UCB1 = self.total_reward / self.visited_times + self.exploration_weight * \
+            UCB1 = self.total_reward / self.visited_times + config.exploration_weight * \
                 math.sqrt(math.log(self.parent_node.visited_times) / self.visited_times)
         else:
             UCB1 = (1 - beta) * (self.total_reward / self.visited_times) + beta * (amaf_value / amaf_count) + \
-                self.exploration_weight * math.sqrt(math.log(self.parent_node.visited_times) / self.visited_times)
+                config.exploration_weight * math.sqrt(math.log(self.parent_node.visited_times) / self.visited_times)
 
         return UCB1
 
@@ -117,9 +120,9 @@ class MCRAVENode(Node):
             for move in legal_moves:
                 child_game_state = deepcopy(self.game_state)
                 child_game_state.make_move(move[0], move[1])
-                self.child_nodes.append(self.get_new_node(child_game_state, move, self, self.exploration_weight, self.player_id))
+                self.child_nodes.append(self.get_new_node(child_game_state, move, self, self.player_id))
                 # To make sure move is in action_amaf_count_value_map
                 self.action_amaf_count_value_map[move] = (0, 0)
 
-    def get_new_node(self, game_state, move, parent_node, exploration_weight, player_id):
-        return MCRAVENode(game_state, move, parent_node, exploration_weight, player_id)
+    def get_new_node(self, game_state, move, parent_node, player_id):
+        return MCRAVENode(game_state, move, parent_node, player_id)

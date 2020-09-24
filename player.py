@@ -3,6 +3,8 @@ from monte_carlo_tree_search import MCTS
 from mc_rave import MCRAVE
 from heuristic_mc_rave import HMCRAVE
 from mcts_solver import MCTSSolver
+from mcts_alpha import MCTSAlpha
+import config
 import sys
 import random
 import re
@@ -10,10 +12,12 @@ from copy import deepcopy
 import time
 import math
 
+
 class Player:
     """
     Represents a player who make moves to play the game
     """
+
     def __init__(self, main_board):
         self.main_board = main_board
 
@@ -21,7 +25,7 @@ class Player:
         """ If a move is made successfully, return True, else return False """
         result = self.main_board.make_move(main_board_coor, sub_board_coor)
         return result
-    
+
     def get_move(self):
         """ 
         Please overwrite this method
@@ -31,13 +35,16 @@ class Player:
         """
         raise NotImplementedError("Function get_move() is not implemented")
 
+
 class RandomPlayer(Player):
     """
     A player that chooses moves randomly from the legal moves
     """
+
     def get_move(self):
         legal_moves = self.main_board.get_legal_moves()
         return random.choice(legal_moves)
+
 
 class HumanPlayer(Player):
     """
@@ -45,8 +52,9 @@ class HumanPlayer(Player):
 
     User should input two strings with a format of [0-2],[0,2], e.g. 1,2, representing the main board coor and the sub board coor
     """
+
     def get_move(self):
-        coor_format = re.compile('\d,\d')
+        coor_format = re.compile('^\d,\d$')
         while True:
             print("Legal sub-boards:", self.main_board.allowed_sub_boards)
             while True:
@@ -72,19 +80,21 @@ class HumanPlayer(Player):
                 print("Invalid move. Coordinates are intergers from 0-" + str(self.main_board.board_size - 1) + ".")
         return input_coor
 
+
 class MCTSPlayer(Player):
     """
     A player that uses the Monte Carlo Tree Search to choose a move that is more likely to win
     """
-    def __init__(self, main_board, player_id, num_of_simulation = 100, time_limit = None):
+
+    def __init__(self, main_board, player_id, num_of_simulation=config.number_of_simulations, time_limit=config.time_limit):
         super().__init__(main_board)
         # To check whether this player has won in a simulation
         self.player_id = player_id
         self.num_of_simulation = num_of_simulation
         self.time_limit = time_limit
-        self.tree = MCTS(deepcopy(self.main_board), 2, self.player_id)
+        self.tree = MCTS(deepcopy(self.main_board), self.player_id)
         self.best_node = self.tree.root_node
-    
+
     def get_opponent_move(self):
         for x_main in range(self.main_board.board_size):
             for y_main in range(self.main_board.board_size):
@@ -99,12 +109,14 @@ class MCTSPlayer(Player):
         # Update root node to the node after opponent moved
         if not self.tree.root_node.child_nodes:
             self.tree.root_node.expand()
+            self.tree.root_node.visited_times += 1
         for node in self.tree.root_node.child_nodes:
             if node.move == self.get_opponent_move():
                 self.tree.root_node = node
                 self.tree.root_node.parent_node = None
                 break
-        # Run simulations
+
+       # Run simulations
         if self.num_of_simulation != 0:
             for _ in range(self.num_of_simulation):
                 if self.time_limit is not None and time.time() - start_time >= self.time_limit:
@@ -116,7 +128,7 @@ class MCTSPlayer(Player):
         end_time = time.time()
         # print(self.player_id, end_time - start_time)
         return best_move
-    
+
     def make_move(self, main_board_coor, sub_board_coor):
         """ If a move is made successfully, return True, else return False """
         result = self.main_board.make_move(main_board_coor, sub_board_coor)
@@ -127,26 +139,30 @@ class MCTSPlayer(Player):
             self.tree.root_node.parent_node = None
         return result
 
+
 class MCRAVEPlayer(MCTSPlayer):
-    def __init__(self, main_board, player_id, num_of_simulation=100, time_limit=None):
+    def __init__(self, main_board, player_id, num_of_simulation=config.number_of_simulations, time_limit=config.time_limit):
         super().__init__(main_board, player_id, num_of_simulation=num_of_simulation, time_limit=time_limit)
-        self.tree = MCRAVE(deepcopy(self.main_board), 2, self.player_id)
+        self.tree = MCRAVE(deepcopy(self.main_board), self.player_id)
+
 
 class HMCRAVEPlayer(MCTSPlayer):
-    def __init__(self, main_board, player_id, num_of_simulation=100, time_limit=None):
+    def __init__(self, main_board, player_id, num_of_simulation=config.number_of_simulations, time_limit=config.time_limit):
         super().__init__(main_board, player_id, num_of_simulation=num_of_simulation, time_limit=time_limit)
-        self.tree = HMCRAVE(deepcopy(self.main_board), 2, self.player_id)
+        self.tree = HMCRAVE(deepcopy(self.main_board), self.player_id)
+
 
 class MCTSSolverPlayer(MCTSPlayer):
-    def __init__(self, main_board, player_id, num_of_simulation=100, time_limit=None):
+    def __init__(self, main_board, player_id, num_of_simulation=config.number_of_simulations, time_limit=config.time_limit):
         super().__init__(main_board, player_id, num_of_simulation=num_of_simulation, time_limit=time_limit)
-        self.tree = MCTSSolver(deepcopy(self.main_board), 2, self.player_id)
+        self.tree = MCTSSolver(deepcopy(self.main_board), self.player_id)
 
     def get_move(self):
         start_time = time.time()
         # Update root node to the node after opponent moved
         if not self.tree.root_node.child_nodes:
             self.tree.root_node.expand()
+            self.tree.root_node.visited_times += 1
         for node in self.tree.root_node.child_nodes:
             if node.move == self.get_opponent_move():
                 self.tree.root_node = node
@@ -154,16 +170,65 @@ class MCTSSolverPlayer(MCTSPlayer):
                 break
         # Run simulations
         if self.num_of_simulation != 0:
-            for _ in range(self.num_of_simulation):
+            for i in range(self.num_of_simulation):
+                if self.time_limit is not None and time.time() - start_time >= self.time_limit:
+                    break
+
+                for child_node in self.tree.root_node.child_nodes:
+                    # Early stop
+                    if child_node.total_reward == math.inf:
+                        self.best_node = child_node
+                        return child_node.move
+                
+                # a = time.time()
+                self.tree.simulation()
+                # print("Simulation: ", time.time() - a)
+
+        self.best_node = self.tree.get_best_node()
+        best_move = self.best_node.move
+        end_time = time.time()
+        # print(self.player_id, end_time - start_time)
+        return best_move
+
+class MCTSAlphaPlayer(MCTSSolverPlayer):
+    def __init__(self, main_board, player_id, net, num_of_simulation=config.number_of_simulations, time_limit=config.time_limit):
+        super().__init__(main_board, player_id, num_of_simulation=num_of_simulation, time_limit=time_limit)
+        self.tree = MCTSAlpha(deepcopy(self.main_board), self.player_id, net)
+        self.turn = player_id - 1
+
+    def get_prob(self):
+        return self.tree.get_prob()
+
+    def get_move(self, training_mode=False):
+        start_time = time.time()
+        # Update root node to the node after opponent moved
+        if not self.tree.root_node.child_nodes:
+            self.tree.root_node.expand()
+            self.tree.root_node.visited_times += 1
+        for node in self.tree.root_node.child_nodes:
+            if node.move == self.get_opponent_move():
+                self.tree.root_node = node
+                self.tree.root_node.parent_node = None
+                break
+        # Run simulations
+        if self.num_of_simulation != 0:
+            for i in range(self.num_of_simulation):
                 if self.time_limit is not None and time.time() - start_time >= self.time_limit:
                     break
                 for child_node in self.tree.root_node.child_nodes:
                     # Early stop
                     if child_node.total_reward == math.inf:
+                        print("Inf move found")
+                        self.best_node = child_node
                         return child_node.move
+                
+                # a = time.time()
                 self.tree.simulation()
+                # print("Simulation: ", time.time() - a)
 
-        self.best_node = self.tree.get_best_node()
+        self.best_node = self.tree.get_best_node(self.turn, training_mode=training_mode)
+        # Includes opponent's turn
+        self.turn += 2
         best_move = self.best_node.move
         end_time = time.time()
         # print(self.player_id, end_time - start_time)

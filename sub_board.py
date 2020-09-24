@@ -1,10 +1,12 @@
+import config
+
 class SubBoard:
     """
     A class representing a sub board of the ultimate tic tac toe game
 
     UpperLeft cell is (0, 0), UpperRight cell is (0, 2)
     """
-    def __init__(self, board_size = 3):
+    def __init__(self, board_size = config.board_size):
         self.board_size = board_size
         # None: not yet ended, 0: tie, 1: player 1 is the winner, 2: player 2 is the winner
         self.winner = None
